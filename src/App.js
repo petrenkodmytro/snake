@@ -1,5 +1,5 @@
 import "./App.css";
-import Snake from "./components/snake/snake";
+import SnakePage from "./components/SnakePage";
 
 function App() {
   return (
@@ -8,9 +8,13 @@ function App() {
         <p>SNAKE</p>
       </header>
       <main className="min-h-[90vh]">
-        <Snake />
+        <SnakePage />
       </main>
-      <footer className="text-red-900">Developed by Dmytro Petrenko</footer>
+      <footer className="text-red-900">
+        <a className="italic underline text-teal-700" href="https://github.com/petrenkodmytro/snake" target="blank">
+          Developed by Dmytro Petrenko
+        </a>{" "}
+      </footer>
     </div>
   );
 }
