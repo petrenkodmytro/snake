@@ -7,6 +7,8 @@ const Snake = (props) => {
   const [fruit, setFruit] = useState(186);
   const [points, setPoints] = useState(0);
   const [game, setGame] = useState(false);
+  const [pause, setPause] = useState(false);
+  const [nextPoints, setNextPoints] = useState(50);
   const speedRef = useRef(200);
   let width;
   const [snake, setSnake] = useState([
@@ -16,11 +18,10 @@ const Snake = (props) => {
     },
   ]);
 
-  const [pause, setPause] = useState(false);
-
   const reset = () => {
-    speedRef.current = 100;
+    speedRef.current = 200;
     setPoints(0);
+    setNextPoints(50);
     setDirection("right");
     setSnake([
       {
@@ -56,7 +57,7 @@ const Snake = (props) => {
   const turn = useCallback(
     (dir, opp) => {
       let tempSnake = [...snake];
-      console.log(snake[0].part);
+      // console.log(snake[0].part);
       if (snake[0].part.length > 0 && direction !== opp && direction !== dir) {
         setDirection(dir);
         tempSnake.unshift({
@@ -68,6 +69,7 @@ const Snake = (props) => {
     },
     [snake, direction]
   );
+
   width = window.innerWidth;
   useEffect(() => {
     //determine relative dimensions of game portal
@@ -80,7 +82,7 @@ const Snake = (props) => {
 
     //points and get longer after eating
     if (snake[0].part[0] === fruit) {
-      setPoints(points + 1);
+      setPoints(points + 20);
       let sneak = [...snake];
       let firstSection = sneak[0];
       if (firstSection.direction === "up") {
@@ -113,7 +115,8 @@ const Snake = (props) => {
         }
       }
       // speed snake
-      speedRef.current = speedRef.current - 10;
+
+      // speedRef.current = speedRef.current - 10 ;
       setSnake(sneak);
       setFruit(Math.floor(Math.random() * Math.floor(400)));
     }
@@ -224,11 +227,21 @@ const Snake = (props) => {
     }
   }, [turn, width, dim, chunk, snake, direction, points, fruit, game, pause]);
 
+  useEffect(() => {
+    // speed snake
+    if (points >= nextPoints) {
+      console.log("incrementSpeed");
+      setNextPoints(nextPoints + 50);
+      speedRef.current = speedRef.current - 20;
+    }
+    console.log(speedRef.current);
+  }, [points, nextPoints]);
+
   return (
     <div className="snake-container" id="snake-container">
       <div className="point-bar mb-5" style={{ width: dim }}>
         <div style={{ color: props.colorSnake }}>Score: {points}</div>
-        <button onClick={() => setPause(!pause)}>{pause ? "Continion" : "Pause"}</button>
+        <button className="p-2 border-1 font-bold rounded-md bg-[#248ec2] text-white" onClick={() => setPause(!pause)}>{pause ? "Continion" : "Pause"}</button>
       </div>
       <div className="game-border" style={{ width: dim, height: dim, backgroundColor: props.backgroundColor }}>
         {pieces().map((piece, i) => {
