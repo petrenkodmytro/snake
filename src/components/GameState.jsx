@@ -4,10 +4,10 @@ const Snake = (props) => {
   const [dim, setDim] = useState(0);
   const [chunk, setChunk] = useState(0);
   const [direction, setDirection] = useState("right");
-  const [fruit, setFruit] = useState(26);
+  const [fruit, setFruit] = useState(186);
   const [points, setPoints] = useState(0);
   const [game, setGame] = useState(false);
-  const speedRef = useRef(100);
+  const speedRef = useRef(200);
   let width;
   const [snake, setSnake] = useState([
     {
@@ -15,6 +15,8 @@ const Snake = (props) => {
       part: [186, 185, 184, 183],
     },
   ]);
+
+  const [pause, setPause] = useState(false);
 
   const reset = () => {
     speedRef.current = 100;
@@ -28,7 +30,8 @@ const Snake = (props) => {
     ]);
     setGame(false);
   };
-
+  // console.log(snake)
+  // console.log(fruit)
   const pieces = () => {
     //functionally label snake pieces (bang) and return
     let arr = [];
@@ -68,7 +71,6 @@ const Snake = (props) => {
   width = window.innerWidth;
   useEffect(() => {
     //determine relative dimensions of game portal
-   
     if (width >= 800) {
       setDim(width * 0.35);
     } else if (width < 800) {
@@ -110,7 +112,8 @@ const Snake = (props) => {
           firstSection.part.unshift(y);
         }
       }
-      speedRef.current = speedRef.current - 2;
+      // speed snake
+      speedRef.current = speedRef.current - 10;
       setSnake(sneak);
       setFruit(Math.floor(Math.random() * Math.floor(400)));
     }
@@ -211,20 +214,21 @@ const Snake = (props) => {
         });
         setSnake(sneak);
       }, speedRef.current);
-
+      // pause game
+      pause && clearInterval(interval);
       //remove interval and listeners
       return () => {
         clearInterval(interval);
         document.removeEventListener("keydown", handleKeydown);
       };
     }
-  }, [turn, width, dim, chunk, snake, direction, points, fruit, game]);
+  }, [turn, width, dim, chunk, snake, direction, points, fruit, game, pause]);
 
   return (
-
     <div className="snake-container" id="snake-container">
-          <div className="point-bar mb-5" style={{ width: dim }}>
+      <div className="point-bar mb-5" style={{ width: dim }}>
         <div style={{ color: props.colorSnake }}>Score: {points}</div>
+        <button onClick={() => setPause(!pause)}>{pause ? "Continion" : "Pause"}</button>
       </div>
       <div className="game-border" style={{ width: dim, height: dim, backgroundColor: props.backgroundColor }}>
         {pieces().map((piece, i) => {
@@ -247,7 +251,7 @@ const Snake = (props) => {
           </div>
         )}
       </div>
-    
+
       {/* mobile btn */}
       {width <= 1024 && (
         <div className="snake-mobile-buttons" style={{ width: dim, margin: "auto" }}>
