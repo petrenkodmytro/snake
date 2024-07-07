@@ -256,7 +256,8 @@ const Snake = ({ playerName, setPlayer, colorSnake, backgroundColor }) => {
         document.removeEventListener("keydown", handleKeydown);
       };
     }
-  }, [dim, fruit.place, fruit.value, game, pause, playerName, points, setPlayer, snake, turn, width]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dim, fruit.place, fruit.value, game, pause, points, setPlayer, snake, turn, width]);
 
   useEffect(() => {
     // speed snake
