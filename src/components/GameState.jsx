@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import Swal from "sweetalert2";
 
-const Snake = (props) => {
+const Snake = ({ playerName, setPlayer, colorSnake, backgroundColor }) => {
   const [dim, setDim] = useState(0);
   const [chunk, setChunk] = useState(0);
   const [direction, setDirection] = useState("right");
-  const [fruit, setFruit] = useState({ place: 186, value: 1 });
+  const [fruit, setFruit] = useState({ place: 186, value: 0 });
   const [points, setPoints] = useState(0);
-  const [game, setGame] = useState(false);
+  const [game, setGame] = useState(true);
   const [pause, setPause] = useState(false);
   const [nextPoints, setNextPoints] = useState(50);
   const speedRef = useRef(200);
@@ -34,7 +35,16 @@ const Snake = (props) => {
     default:
   }
 
+  // const gameOver = async () => {
+  //   setGame(true);
+  //   setPlayer({ name: props.playerName, score: points });
+  // };
+
   const reset = () => {
+    if (playerName === "") {
+      Swal.fire("Please enter your name!");
+      return;
+    }
     speedRef.current = 200;
     setPoints(0);
     setNextPoints(50);
@@ -135,7 +145,7 @@ const Snake = (props) => {
       setSnake(sneak);
 
       let valueFruit = [1, 5, 10][Math.floor(Math.random() * [1, 5, 10].length)];
-      console.log(valueFruit);
+      // console.log(valueFruit);
       setFruit({ place: Math.floor(Math.random() * Math.floor(400)), value: valueFruit });
     }
 
@@ -144,8 +154,12 @@ const Snake = (props) => {
     for (let k = 0; k < snake.length; k++) {
       totalArr = [...totalArr, ...snake[k].part];
     }
+    const gameOver = async () => {
+      setGame(true);
+      setPlayer({ name: playerName, score: points });
+    };
     let head = snake[0].part[0];
-    totalArr.filter((item) => item === head).length >= 2 && setGame(true);
+    totalArr.filter((item) => item === head).length >= 2 && gameOver();
 
     if (!game) {
       //if GAMEOVER pause events
@@ -242,51 +256,67 @@ const Snake = (props) => {
         document.removeEventListener("keydown", handleKeydown);
       };
     }
-  }, [turn, width, dim, chunk, snake, direction, points, fruit, game, pause]);
+  }, [dim, fruit.place, fruit.value, game, pause, playerName, points, setPlayer, snake, turn, width]);
 
   useEffect(() => {
     // speed snake
     if (points >= nextPoints) {
-      console.log("incrementSpeed");
+      // console.log("incrementSpeed");
       setNextPoints(nextPoints + 50);
       speedRef.current = speedRef.current - 20;
     }
-    console.log(speedRef.current);
+    // console.log(speedRef.current);
   }, [points, nextPoints]);
 
   return (
     <div className="snake-container" id="snake-container">
       <div className="point-bar mb-5" style={{ width: dim }}>
-        <div className="font-bold" style={{ color: props.colorSnake }}>
+        <div className="font-bold" style={{ color: colorSnake }}>
           Score: {points}
         </div>
-        <button
-          className="w-[100px] p-2 border-1 font-bold rounded-md bg-[#248ec2] text-white"
-          onClick={() => setPause(!pause)}>
-          {pause ? "Continion" : "Pause"}
-        </button>
+        <div className="flex justify-between items-center text-xs md:text-sm">
+          <div className="flex gap-1 items-center">
+            <div className="w-3 h-3 md:w-5 md:h-5 bg-[#e5df3c]" /> - 1 point
+          </div>
+          <div className="flex gap-1 items-center">
+            <div className="w-3 h-3 md:w-5 md:h-5 bg-[#20cf3d]" /> - 5 point
+          </div>
+          <div className="flex gap-1 items-center">
+            <div className="w-3 h-3 md:w-5 md:h-5 bg-[#f22e79]" />- 10 point
+          </div>
+          <button
+            className="w-[100px] p-2 border-1 font-bold rounded-md bg-[#248ec2] text-white disabled:bg-[#B1B1B1]"
+            onClick={() => setPause(!pause)}
+            disabled={game}>
+            {pause ? "Continion" : "Pause"}
+          </button>
+        </div>
       </div>
-      <div className="game-border" style={{ width: dim, height: dim, backgroundColor: props.backgroundColor }}>
+      <ul className="game-border" style={{ width: dim, height: dim, backgroundColor: backgroundColor }}>
         {pieces().map((piece, i) => {
           return (
-            <div
+            <li
               key={"piece" + i}
               style={
                 piece === "bang"
-                  ? { width: chunk, height: chunk, backgroundColor: props.colorSnake }
+                  ? { width: chunk, height: chunk, backgroundColor: colorSnake }
                   : piece === "fruit"
                   ? { width: chunk, height: chunk, backgroundColor: colorFruit }
                   : { width: chunk, height: chunk }
-              }></div>
+              }></li>
           );
         })}
         {game && (
           <div className="game-splash" style={{ height: dim }}>
-            <div>Game Over!</div>
-            <button onClick={() => reset()}>Play Again</button>
+            <div>Start</div>
+            <button onClick={() => reset()}>Play</button>
           </div>
+          //    <div className="game-splash" style={{ height: dim }}>
+          //    <div>{points ? "Game Over!" : "Start"}</div>
+          //    <button onClick={() => reset()}>{points ? "Play Again" : "Play"}</button>
+          //  </div>
         )}
-      </div>
+      </ul>
 
       {/* mobile btn */}
       {width <= 1024 && (

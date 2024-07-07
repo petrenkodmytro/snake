@@ -1,16 +1,54 @@
-// import React, { useEffect, useState } from "react";
-// import { getPlayers } from "../api/api";
+import React, { useEffect, useState } from "react";
+import { addPlayer, getPlayers } from "../api/api";
 
 import GameState from "./GameState";
 
 const SnakePage = () => {
-  // const [userName, setUserName] = useState("");
-  // const [players, setPlayers] = useState([]);
+  const [playerName, setPlayerName] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [player, setPlayer] = useState({ name: "", score: 0 });
+
+  const onChangeInput = (e) => {
+    setPlayerName(e.currentTarget.value.trim());
+  };
+  console.log(playerName);
+  useEffect(() => {
+    setIsLoading(true);
+    const addPlayerToTable = async () => {
+      try {
+        if (player.name === "") {
+          const players = await getPlayers();
+          // console.log(players);
+          setPlayers(players);
+          setIsLoading(false);
+          return;
+        } else {
+          setPlayerName("");
+          setPlayer({ name: "", score: 0 });
+          const newPlayer = await addPlayer(player);
+          console.log(newPlayer);
+          const players = await getPlayers();
+          // console.log(players);
+          setPlayers(players);
+          setIsLoading(false);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    addPlayerToTable();
+  }, [player]);
+
   // useEffect(() => {
+  //   setIsLoading(true);
   //   const fetchPlayers = async () => {
   //     try {
   //       const players = await getPlayers();
   //       console.log(players);
+  //       setPlayers(players);
+  //       setIsLoading(false);
   //     } catch (error) {
   //       console.log(error);
   //     }
@@ -19,9 +57,40 @@ const SnakePage = () => {
   // }, []);
 
   return (
-    <div>
-      <GameState colorSnake="#248ec2" backgroundColor="#ebebeb" />
-    </div>
+    <section className="flex flex-col items-center">
+      <div className="flex gap-10 justify-center items-center">
+        <div className="relative mt-4 w-full min-w-[200px] h-10">
+          <input
+            className="peer w-full h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-teal-500"
+            placeholder=" "
+            onChange={onChangeInput}
+            value={playerName}
+          />
+          <label className="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight peer-disabled:text-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500 transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-blue-gray-400 peer-focus:text-teal-500 before:border-blue-gray-200 peer-focus:before:!border-teal-500 after:border-blue-gray-200 peer-focus:after:!border-teal-500">
+            Player name
+          </label>
+        </div>
+      </div>
+
+      <h1 className="text-lg font-bold text-center mb-1">Table Score</h1>
+      {isLoading ? (
+        <div>Loading.....</div>
+      ) : (
+        <ul className="w-[350px] md:w-[450px] h-[150px] overflow-y-scroll  text-lg font-semibold border-2 border-teal-700">
+          {players
+            .sort((firstPlayer, secondPlayer) => secondPlayer.score - firstPlayer.score)
+            .map((player) => {
+              return (
+                <li className="flex justify-between py-1 px-3 odd:bg-slate-200" key={player.id}>
+                  <p>{player.name}</p>
+                  <p>{player.score}</p>
+                </li>
+              );
+            })}
+        </ul>
+      )}
+      <GameState playerName={playerName} setPlayer={setPlayer} colorSnake="#248ec2" backgroundColor="#ebebeb" />
+    </section>
   );
 };
 

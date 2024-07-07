@@ -14,7 +14,7 @@ function App() {
       <main className="min-h-[90vh]">
         <SnakePage />
       </main>
-      <footer className="text-red-900">
+      <footer className="py-10 text-red-900">
         <a className="italic underline text-teal-700" href="https://github.com/petrenkodmytro/snake" target="blank">
           Developed by Dmytro Petrenko
         </a>{" "}
