@@ -4,19 +4,35 @@ const Snake = (props) => {
   const [dim, setDim] = useState(0);
   const [chunk, setChunk] = useState(0);
   const [direction, setDirection] = useState("right");
-  const [fruit, setFruit] = useState(186);
+  const [fruit, setFruit] = useState({ place: 186, value: 1 });
   const [points, setPoints] = useState(0);
   const [game, setGame] = useState(false);
   const [pause, setPause] = useState(false);
   const [nextPoints, setNextPoints] = useState(50);
   const speedRef = useRef(200);
-  let width;
   const [snake, setSnake] = useState([
     {
       direction: "right",
       part: [186, 185, 184, 183],
     },
   ]);
+  let width;
+
+  // change colorFruit depending on the valueFruit
+  let colorFruit;
+  switch (fruit.value) {
+    case 1:
+      colorFruit = "#e5df3c";
+      break;
+    case 5:
+      colorFruit = "#20cf3d";
+      break;
+    case 10:
+      colorFruit = "#f22e79";
+      break;
+
+    default:
+  }
 
   const reset = () => {
     speedRef.current = 200;
@@ -31,8 +47,7 @@ const Snake = (props) => {
     ]);
     setGame(false);
   };
-  // console.log(snake)
-  // console.log(fruit)
+
   const pieces = () => {
     //functionally label snake pieces (bang) and return
     let arr = [];
@@ -48,8 +63,9 @@ const Snake = (props) => {
         }
         j++;
       }
-      addToArr ? arr.push("bang") : i === fruit ? arr.push("fruit") : arr.push("");
+      addToArr ? arr.push("bang") : i === fruit.place ? arr.push("fruit") : arr.push("");
     }
+    // console.log(arr)
     return arr;
   };
 
@@ -81,8 +97,8 @@ const Snake = (props) => {
     setChunk(dim / 20);
 
     //points and get longer after eating
-    if (snake[0].part[0] === fruit) {
-      setPoints(points + 20);
+    if (snake[0].part[0] === fruit.place) {
+      setPoints(points + fruit.value);
       let sneak = [...snake];
       let firstSection = sneak[0];
       if (firstSection.direction === "up") {
@@ -115,10 +131,12 @@ const Snake = (props) => {
         }
       }
       // speed snake
-
       // speedRef.current = speedRef.current - 10 ;
       setSnake(sneak);
-      setFruit(Math.floor(Math.random() * Math.floor(400)));
+
+      let valueFruit = [1, 5, 10][Math.floor(Math.random() * [1, 5, 10].length)];
+      console.log(valueFruit);
+      setFruit({ place: Math.floor(Math.random() * Math.floor(400)), value: valueFruit });
     }
 
     //gameover if you eat your tail
@@ -131,7 +149,6 @@ const Snake = (props) => {
 
     if (!game) {
       //if GAMEOVER pause events
-
       //listen for directions and update snake instructions accordingly
       const handleKeydown = (e) => {
         //let tempSnake: any = [...snake];
@@ -240,8 +257,14 @@ const Snake = (props) => {
   return (
     <div className="snake-container" id="snake-container">
       <div className="point-bar mb-5" style={{ width: dim }}>
-        <div style={{ color: props.colorSnake }}>Score: {points}</div>
-        <button className="p-2 border-1 font-bold rounded-md bg-[#248ec2] text-white" onClick={() => setPause(!pause)}>{pause ? "Continion" : "Pause"}</button>
+        <div className="font-bold" style={{ color: props.colorSnake }}>
+          Score: {points}
+        </div>
+        <button
+          className="w-[100px] p-2 border-1 font-bold rounded-md bg-[#248ec2] text-white"
+          onClick={() => setPause(!pause)}>
+          {pause ? "Continion" : "Pause"}
+        </button>
       </div>
       <div className="game-border" style={{ width: dim, height: dim, backgroundColor: props.backgroundColor }}>
         {pieces().map((piece, i) => {
@@ -252,7 +275,7 @@ const Snake = (props) => {
                 piece === "bang"
                   ? { width: chunk, height: chunk, backgroundColor: props.colorSnake }
                   : piece === "fruit"
-                  ? { width: chunk, height: chunk, backgroundColor: props.colorFood }
+                  ? { width: chunk, height: chunk, backgroundColor: colorFruit }
                   : { width: chunk, height: chunk }
               }></div>
           );

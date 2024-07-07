@@ -20,7 +20,7 @@ const SnakePage = () => {
 
   return (
     <div>
-      <GameState colorSnake="#248ec2" colorFood="#1d355e" backgroundColor="#ebebeb" />
+      <GameState colorSnake="#248ec2" backgroundColor="#ebebeb" />
     </div>
   );
 };
