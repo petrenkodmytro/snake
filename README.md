@@ -18,10 +18,10 @@
 
 # 3.7 Three types of feed
 
-# 3.7.1 First 1 point
+## 3.7.1 First 1 point
 
-# 3.7.2 Second 5 point
+## 3.7.2 Second 5 point
 
-# 3.7.3 Third 10 point
+## 3.7.3 Third 10 point
 
 # 3.8 Every 50 point snake`s speed is increase
